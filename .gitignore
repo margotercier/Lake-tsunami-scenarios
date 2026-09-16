@@ -1,0 +1,6 @@
+# Large binary intermediates - regenerate with the pipeline (see README)
+data/*.npy
+outputs/*.npy
+outputs/*.log
+__pycache__/
+*.pyc
