@@ -1,0 +1,500 @@
+<title>Lake Hāwea Tsunami Scenarios</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+  :root{
+    --paper:#f4f5f3; --raise:#fbfbfa; --ink:#14191c; --ink-2:#3d464e; --muted:#6a747e;
+    --rule:#dcdfdb; --rule-2:#c6cac4;
+    --lake:#14548f; --lake-2:#3a7cbb; --lake-pale:#d6e5f4;
+    --alert:#a8391b; --alert-pale:#f3e2dc;
+    --shadow:0 1px 2px rgba(20,25,28,.06), 0 8px 24px -16px rgba(20,25,28,.28);
+    --display:"Barlow Semi Condensed",-apple-system,"Segoe UI",sans-serif;
+    --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --paper:#0e1317; --raise:#151c22; --ink:#eef1ef; --ink-2:#c3cbd1; --muted:#8e99a3;
+    --rule:#26303a; --rule-2:#39454f;
+    --lake:#79b0e6; --lake-2:#4d8dc9; --lake-pale:#14283c;
+    --alert:#e5876a; --alert-pale:#33201a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }}
+  :root[data-theme="dark"]{
+    --paper:#0e1317; --raise:#151c22; --ink:#eef1ef; --ink-2:#c3cbd1; --muted:#8e99a3;
+    --rule:#26303a; --rule-2:#39454f;
+    --lake:#79b0e6; --lake-2:#4d8dc9; --lake-pale:#14283c;
+    --alert:#e5876a; --alert-pale:#33201a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+
+  body{background:var(--paper); color:var(--ink); font-family:var(--body);
+       font-size:17px; line-height:1.62; -webkit-font-smoothing:antialiased;}
+  .wrap{padding-inline:20px; padding-block:0; max-width:1120px; margin-inline:auto;}
+  .col{max-width:64ch; margin-inline:auto;}
+  h1,h2,h3,.lbl,th{font-family:var(--display); text-wrap:balance;}
+  h1{font-size:clamp(2.6rem,7vw,4.2rem); line-height:.98; font-weight:700;
+     letter-spacing:-.015em; margin:0;}
+  h2{font-size:clamp(1.5rem,3.4vw,2.05rem); line-height:1.1; font-weight:600;
+     margin:0 0 .2em; letter-spacing:-.01em;}
+  h3{font-size:1.18rem; font-weight:600; margin:2.2em 0 .3em; line-height:1.25;}
+  p{margin:0 0 1.05em;}
+  a{color:var(--lake); text-decoration-thickness:1px; text-underline-offset:2px;}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--lake); outline-offset:3px; border-radius:2px;}
+  .lbl{font-size:.74rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+       color:var(--muted);}
+
+  /* masthead */
+  header.top{border-bottom:1px solid var(--rule-2); padding-block:clamp(34px,7vw,64px) 30px;}
+  .eyebrow{display:flex; gap:14px; flex-wrap:wrap; align-items:baseline; margin-bottom:18px;}
+  .standfirst{font-size:clamp(1.1rem,2.1vw,1.32rem); color:var(--ink-2); margin-top:.7em;
+              max-width:56ch; line-height:1.48;}
+  .caveat{margin-top:26px; border-left:3px solid var(--alert); background:var(--alert-pale);
+          padding:14px 18px; font-size:.95rem; color:var(--ink-2); border-radius:0 3px 3px 0;}
+  .caveat b{color:var(--ink);}
+
+  /* key figures strip */
+  .strip{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+         gap:1px; background:var(--rule); border-block:1px solid var(--rule);
+         margin-block:0;}
+  .stat{background:var(--paper); padding:20px 18px;}
+  .stat .n{font-family:var(--display); font-weight:700; font-size:2.1rem; line-height:1;
+           color:var(--ink); font-variant-numeric:tabular-nums;}
+  .stat .n.hot{color:var(--alert);}
+  .stat .k{font-size:.78rem; color:var(--muted); margin-top:7px; line-height:1.35;}
+
+  section{padding-block:clamp(38px,6vw,62px); border-bottom:1px solid var(--rule);}
+  section:last-of-type{border-bottom:none;}
+  .sec-head{margin-bottom:1.6em;}
+
+  /* answers */
+  .qa{border-top:1px solid var(--rule); padding-top:20px; margin-top:20px;}
+  .qa:first-of-type{border-top:none; margin-top:0; padding-top:0;}
+  .qa .q{font-family:var(--display); font-weight:600; font-size:1.22rem; line-height:1.25;
+         margin:0 0 .45em; color:var(--ink);}
+  .qa .a{color:var(--ink-2);}
+  .qa .a strong{color:var(--ink);}
+
+  /* tables */
+  .tw{overflow-x:auto; margin-block:1.5em; border:1px solid var(--rule);
+      border-radius:3px; background:var(--raise);}
+  table{border-collapse:collapse; width:100%; font-size:.9rem; min-width:460px;}
+  th{font-size:.72rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
+     color:var(--muted); text-align:left; padding:11px 14px; border-bottom:1px solid var(--rule-2);
+     white-space:nowrap; background:var(--raise);}
+  td{padding:10px 14px; border-bottom:1px solid var(--rule); vertical-align:top;
+     font-variant-numeric:tabular-nums;}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right; font-family:var(--mono); font-size:.84rem;}
+  td .hot{color:var(--alert); font-weight:600;}
+  caption{caption-side:bottom; text-align:left; padding:11px 14px; font-size:.82rem;
+          color:var(--muted); border-top:1px solid var(--rule);}
+
+  /* figures */
+  figure{margin:2em 0; }
+  figure img, figure video{width:100%; height:auto; display:block; border-radius:3px;
+    border:1px solid var(--rule); background:var(--raise); box-shadow:var(--shadow);}
+  figcaption{font-size:.86rem; color:var(--muted); margin-top:.7em; line-height:1.45;
+             max-width:70ch;}
+  .wide{max-width:1080px; margin-inline:auto;}
+
+  /* formula */
+  .formula{background:var(--raise); border:1px solid var(--rule); border-radius:3px;
+           padding:18px 20px; margin-block:1.4em; font-family:var(--mono); font-size:.88rem;
+           line-height:1.85; overflow-x:auto; color:var(--ink);}
+  .formula .c{color:var(--muted);}
+  .formula em{color:var(--lake); font-style:normal; font-weight:600;}
+
+  .pull{font-family:var(--display); font-weight:500; font-size:clamp(1.25rem,2.6vw,1.6rem);
+        line-height:1.32; color:var(--ink); border-left:3px solid var(--lake);
+        padding-left:20px; margin-block:1.6em;}
+  .quote{font-style:italic; color:var(--ink-2);}
+  ul,ol{margin:0 0 1.1em; padding-left:1.2em;} li{margin-bottom:.42em;}
+  details{border-top:1px solid var(--rule); padding:14px 0;}
+  summary{cursor:pointer; font-family:var(--display); font-weight:600; font-size:1rem;}
+  details p:first-of-type{margin-top:.8em;}
+  footer{padding-block:44px 60px; color:var(--muted); font-size:.87rem;}
+  footer a{color:var(--lake);}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">
+      <span class="lbl">Ōtākou / Otago, Aotearoa New Zealand</span>
+      <span class="lbl" style="color:var(--lake)">Alpine Fault scenario</span>
+    </div>
+    <h1>If the Alpine Fault ruptures,<br>what happens to Lake&nbsp;Hāwea?</h1>
+    <p class="standfirst">A first quantitative look at landslide- and fault-generated
+      waves on a 392-metre-deep glacial lake with a fast-growing township at its
+      southern end — and at why no such map exists yet for Hāwea, Wānaka or Queenstown.</p>
+    <div class="caveat"><b>This is a research-grade scoping study, not a hazard map.</b>
+      It is built from a 30&nbsp;m global elevation model and a <em>reconstructed</em>
+      bathymetry, because no public depth survey of Lake Hāwea exists. Treat the numbers
+      as indicative of scale, not as design values. Its point is to show the hazard is
+      real and worth surveying properly.</div>
+  </header>
+</div>
+
+<div class="strip" id="strip"></div>
+
+<div class="wrap">
+  <section>
+    <div class="col">
+      <div class="sec-head"><span class="lbl">The short answers</span></div>
+
+      <div class="qa">
+        <p class="q">Does a hazard map already exist for Hāwea, Wānaka or Queenstown?</p>
+        <p class="a"><strong>No — not a published inundation map, for any of the three.</strong>
+          The hazard is named in official documents and the groundwork is laid, but the
+          modelling is not public. Otago Regional Council has modelled tsunami for
+          17 coastal locations and none of the lakes; its 2025 region-wide hazard exposure
+          analysis covers nine hazards and lake tsunami is not among them.</p>
+      </div>
+
+      <div class="qa">
+        <p class="q">How high does a lake tsunami get?</p>
+        <p class="a">Near the slide, <strong>tens of metres</strong> — lake tsunamis are
+          generated in confined water with no ocean to spread into. Several kilometres
+          away, at a township, the credible band is <strong>roughly 1–10 m</strong>.
+          That is the range this model puts at Lake Hāwea township, and it matches the
+          only comparable New Zealand study, at Lake Tekapo.</p>
+      </div>
+
+      <div class="qa">
+        <p class="q">What variables do you need?</p>
+        <p class="a">Eight for the slide, six for the basin, and the trigger. They collapse
+          into <strong>one dimensionless number</strong>, the impulse product parameter
+          <em>P</em>, which predicts the wave almost by itself.</p>
+      </div>
+
+      <div class="qa">
+        <p class="q">What does the map look like?</p>
+        <p class="a">Scroll down — there are maps, an arrival-time chart and an animation
+          of the wave crossing the lake.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-head">
+        <span class="lbl">Question 1</span>
+        <h2>The map doesn't exist — here's exactly what does</h2>
+      </div>
+      <p>Lake Hāwea is not an overlooked lake. It is named directly in the official
+        <em>Alpine Fault Magnitude 8 (AF8) Hazard Scenario</em>, the planning document the
+        South Island CDEM groups use:</p>
+      <p class="pull quote">“…the Hunter Valley Fault under Lake Hawea, and a tsunami there
+        would likely impact Lake Hawea township and possibly the hydro control dam.”</p>
+      <p>That sentence is the state of the art. There is no survey, no model and no map
+        behind it.</p>
+    </div>
+    <div class="wide">
+      <div class="tw"><table>
+        <thead><tr><th>Lake</th><th>What exists</th><th>What doesn't</th></tr></thead>
+        <tbody>
+          <tr><td><b>Hāwea</b></td>
+            <td>Named in AF8. The Hunter Valley Fault is in the GNS Active Faults Database
+              as an uncertain reverse fault crossing the lake.</td>
+            <td>No bathymetric survey, no wave modelling, no inundation map.</td></tr>
+          <tr><td><b>Wānaka</b></td>
+            <td>GNS found a probable active fault under the lake (2019); NIWA surveyed the
+              lakebed 2019–21 and has now mapped the whole lake in detail.</td>
+            <td>No published inundation modelling or map.</td></tr>
+          <tr><td><b>Wakatipu</b></td>
+            <td>Tonkin &amp; Taylor's 2021 Head of Lake Wakatipu assessment discusses
+              delta-collapse tsunami, landslide tsunami and seiche.</td>
+            <td>It states plainly that “the likelihood or possible extent of this has not
+              been investigated or assessed in detail”.</td></tr>
+          <tr><td><b>Tekapo</b></td>
+            <td>The exception. A NIWA–GNS–Otago–ECan study mapped the lakebed, found
+              repeated landslide deposits, and modelled waves that “could exceed 5&nbsp;m at
+              many locations around the lake shoreline”.</td>
+            <td>—</td></tr>
+        </tbody>
+        <caption>Sources: AF8 Hazard Scenario (2016); ORC natural hazards pages and the May 2025
+          Otago Natural Hazards Exposure Analysis; Tonkin &amp; Taylor (2021) for ORC; NIWA.</caption>
+      </table></div>
+    </div>
+    <div class="col">
+      <p>The Tekapo researchers explicitly named Wakatipu, Wānaka and Taupō as lakes that
+        should get the same treatment. Hāwea wasn't on that list — AF8 put it there
+        separately. Ten years on, neither list has been worked through.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-head">
+        <span class="lbl">Question 2</span>
+        <h2>How big is a lake tsunami?</h2>
+      </div>
+      <p>Bigger than most people expect, and the reason is geometry. An ocean tsunami
+        spreads across a basin and arrives as a long, low wave. A lake tsunami is generated
+        a few hundred metres from the shore it then hits, in water that is deep but narrow,
+        and there is nowhere for the energy to go.</p>
+    </div>
+    <div class="wide">
+      <div class="tw"><table>
+        <thead><tr><th>Event</th><th>Year</th><th class="num">Slide volume</th><th class="num">Max wave / run-up</th></tr></thead>
+        <tbody>
+          <tr><td>Deep Cove, Fiordland 🇳🇿</td><td>1987</td><td class="num">0.1 M m³</td><td class="num">2.5 m</td></tr>
+          <tr><td>Gold Arm, Charles Sound 🇳🇿</td><td>2003</td><td class="num">0.2 M m³</td><td class="num">4.5 m</td></tr>
+          <tr><td>Mt Colonel Foster, Canada</td><td>1946</td><td class="num">0.7 M m³</td><td class="num">29 m</td></tr>
+          <tr><td>Chehalis Lake, Canada</td><td>2007</td><td class="num">2.5 M m³</td><td class="num">25 m</td></tr>
+          <tr><td>Tafjord, Norway</td><td>1934</td><td class="num">3 M m³</td><td class="num">62 m</td></tr>
+          <tr><td>Lake Askja, Iceland</td><td>2014</td><td class="num">20 M m³</td><td class="num">71 m</td></tr>
+          <tr><td>Lituya Bay, Alaska</td><td>1958</td><td class="num">30 M m³</td><td class="num"><span class="hot">524 m</span></td></tr>
+        </tbody>
+        <caption>Compiled by GNS Science (Hancox 2012, Table 1), plus Lake Askja from Gylfadóttir et al. (2017).
+          Heights are maximum vertical run-up above lake level, not crest-to-trough wave height.</caption>
+      </table></div>
+    </div>
+    <div class="col">
+      <h3>The rule of thumb GNS uses</h3>
+      <p>For earthquake-triggered failures into New Zealand glacial lakes:</p>
+      <ul>
+        <li><b>10³–10⁴ m³</b> — small debris slides and rock falls → run-up
+          <b>0.5–1 m</b> within a kilometre of the slide.</li>
+        <li><b>10⁵–10⁶ m³</b> — large bedrock failures → run-up <b>~3–25 m</b>,
+          still significant 8 km away.</li>
+        <li><b>&gt;10⁶ m³</b> → tens of metres in the near field.</li>
+      </ul>
+      <p>AF8 puts the practical threshold for a hazardous wave at <b>slides above
+        1000 m³</b> — which is a very small landslide.</p>
+      <p class="pull">A 2–5 m wave arriving at a lakefront with a few minutes' warning is a
+        life-safety emergency, not a curiosity.</p>
+    </div>
+    <div class="wide"><figure>
+      <img src="figures/06_volume_vs_height.png" alt="Log-log chart of landslide volume against maximum wave height, showing seven observed events following a power law, with the three modelled Lake Hāwea scenarios plotted on the same trend.">
+      <figcaption>The observed record, with the three modelled Hāwea scenarios on the same
+        axes. Wave height scales with roughly the cube root of slide volume — which is why
+        a ten-fold bigger landslide does not make a ten-fold bigger wave, and why even
+        modest failures matter.</figcaption>
+    </figure></div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-head">
+        <span class="lbl">Question 3</span>
+        <h2>The variables — and the one number they collapse into</h2>
+      </div>
+      <p>Three groups of inputs. The slide, the basin it lands in, and the earthquake that
+        starts it.</p>
+      <h3>The slide</h3>
+      <p>Volume <b>𝒱</b>, width <b>b</b>, thickness <b>s</b>, impact velocity
+        <b>V<sub>s</sub></b>, drop height of the centre of mass <b>Δz</b>, slope angle
+        <b>α</b>, bulk density <b>ρ<sub>s</sub></b>, basal friction angle <b>δ</b>.</p>
+      <h3>The basin</h3>
+      <p>Still-water depth at impact <b>h</b> — the single most sensitive input — plus the
+        full bathymetry, the shoreline topography, the shore slope <b>β</b>, the lake level
+        (Hāwea is dam-controlled over an 8&nbsp;m range) and bed roughness <b>n</b>.</p>
+      <h3>The trigger</h3>
+      <p>Earthquake magnitude and shaking intensity, distance from the fault, slope
+        susceptibility, any mapped active faults under the lake, and the basin's own
+        seiche modes.</p>
+      <h3>Then it all collapses</h3>
+      <p>Everything about the slide reduces to Heller &amp; Hager's <b>impulse product
+        parameter</b>, and the wave follows from it:</p>
+      <div class="formula">
+<em>P</em> = F · S<sup>½</sup> · M<sup>¼</sup> · [cos(6α/7)]<sup>½</sup>
+
+   F = V<sub>s</sub> / √(g h)          <span class="c">slide Froude number</span>
+   S = s / h                <span class="c">relative slide thickness</span>
+   M = ρ<sub>s</sub>𝒱 / (ρ<sub>w</sub> b h²)     <span class="c">relative slide mass</span>
+
+<em>H<sub>M</sub></em> = (5/9) · P<sup>0.8</sup> · h      <span class="c">maximum wave height</span>
+<em>x<sub>M</sub></em> = (11/2) · P<sup>0.5</sup> · h     <span class="c">where it occurs</span>
+<em>T<sub>M</sub></em> = 9 · P<sup>0.5</sup> · √(h/g)     <span class="c">its period</span>
+      </div>
+      <p>If you take one thing from this: <b>P is the number to compute.</b> The
+        implementation used here reproduces the worked Lake Askja example from the
+        VAW-211 manual to within 1%, which is the check that says the code is right.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-head">
+        <span class="lbl">Question 4</span>
+        <h2>The maps</h2>
+      </div>
+      <p>Screening all 137 km of shoreline for slopes steeper than 30° with more than
+        400 m of relief behind them leaves four candidate source zones — about 7% of the
+        shore. The scenarios below all place the slide in the highest-ranked one: a
+        3.9 km stretch of the mid-lake east shore, 38.5° mean slope, 1125 m of relief,
+        17 km up-lake from the township.</p>
+    </div>
+    <div class="wide" id="results"></div>
+    <div class="wide"><figure>
+      <img src="figures/01_overview.png" alt="Three-panel map of Lake Hāwea showing modelled maximum wave height across the lake for three landslide scenarios of increasing size.">
+      <figcaption>Maximum wave height reached anywhere on the lake during the simulation,
+        for each scenario. The star marks the slide. Blue is wave height on the water;
+        orange is inundation depth on land.</figcaption>
+    </figure></div>
+    <div class="wide"><figure>
+      <img src="figures/02_township.png" alt="Close-up maps of Lake Hāwea township showing modelled inundation depth on land for three scenarios.">
+      <figcaption>Lake Hāwea township. The exposed ground is the foreshore strip, the
+        campground and the boat ramp — the places people are on a summer afternoon.</figcaption>
+    </figure></div>
+    <div class="wide"><figure>
+      <img src="figures/03_arrival.png" alt="Map of Lake Hāwea contoured by wave arrival time in minutes after the landslide.">
+      <figcaption>Arrival time. The travel time down the lake is the entire warning
+        window — there is no distant source and no watch phase.</figcaption>
+    </figure></div>
+    <div class="wide" id="videoblock"></div>
+    <div class="wide"><figure>
+      <img src="figures/04_gauges.png" alt="Water level time series at Lake Hāwea township and the Hāwea dam for three landslide scenarios.">
+      <figcaption>Water level through time at the township foreshore and at the dam.
+        Note that the first crest is not always the largest.</figcaption>
+    </figure></div>
+    <div class="wide" id="tectonic"></div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-head">
+        <span class="lbl">Afterwards</span>
+        <h2>The lake keeps ringing</h2>
+      </div>
+      <p>Once the first wave has passed, the basin oscillates as a whole — a seiche.
+        Solving the shallow-water eigenvalue problem on the real lake outline gives the
+        periods at which Lake Hāwea rings, and these are the periods that long-period
+        surface waves from a distant Alpine Fault rupture can drive directly.</p>
+      <p id="seicheline"></p>
+    </div>
+    <div class="wide"><figure>
+      <img src="figures/05_seiche.png" alt="Four maps of Lake Hāwea showing the shapes of its first four natural seiche modes, with blue and orange marking opposite phases of the standing wave.">
+      <figcaption>The first four free oscillation modes. In mode 1 the whole lake tilts
+        about a node near The Neck: when the head of the lake is up, the township end is
+        down. Blue and orange are opposite phases.</figcaption>
+    </figure></div>
+    <div class="col">
+      <p class="pull">The hazard does not end when the first wave has passed. Water keeps
+        sloshing at these periods for hours, and the third oscillation can catch anyone
+        who has gone back down to the shore.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-head"><h2>What would make this a real study</h2></div>
+      <p>Everything below is a limitation of this model, in rough order of how much it
+        matters.</p>
+      <details open><summary>1. There is no bathymetric survey of Lake Hāwea</summary>
+        <p>The depth field here is reconstructed from a distance-to-shore transform
+          calibrated to the published maximum (392 m) and mean (161 m) depths. A
+          sensitivity test shows near-field wave height varies only about ±35% across a
+          ten-fold range of assumed impact depth, so the broad picture is more robust than
+          that sounds — but refraction and focusing along the real lakebed are not
+          captured. <b>A multibeam survey is the single highest-value thing anyone could
+          commission here</b>, and NIWA has already done exactly this for Wānaka and Tekapo.</p></details>
+      <details><summary>2. The elevation model is a surface model at 30 m</summary>
+        <p>Copernicus GLO-30 includes buildings and trees and cannot resolve a lakefront.
+          Inundation extent at the township is indicative only. LINZ holds LiDAR coverage
+          for Otago, which is the right input.</p></details>
+      <details><summary>3. The landslide is parameterised, not simulated</summary>
+        <p>A coupled granular-flow model — the approach used for Lake Askja — captures the
+          generation phase far better than empirical equations can.</p></details>
+      <details><summary>4. Wave generation is extrapolated past the experimental range</summary>
+        <p>The slides are wide relative to the impact-zone depth, beyond the range of the
+          laboratory experiments the equations come from, and the near field sits at the
+          breaking limit where amplitude has to be capped.</p></details>
+      <details><summary>5. These are scenarios, not probabilities</summary>
+        <p>Nothing here assigns a likelihood to any particular failure. A real study needs
+          an earthquake-induced landslide susceptibility analysis behind it.</p></details>
+      <details><summary>6. Delta collapse and dam-break are not modelled</summary>
+        <p>The Hunter River delta at the head of the lake is a credible subaqueous failure
+          source, which AF8 flags explicitly. And overtopping at the Hāwea dam is reported
+          here as a water level, not routed down the Hāwea River to Albert Town.</p></details>
+    </div>
+  </section>
+
+  <footer>
+    <div class="col">
+      <p><span class="lbl">Method</span><br>
+      Source wave sized with the Heller, Hager &amp; Minor (2009 / 2019, VAW-211) impulse-wave
+      equations, validated against that manual's own Lake Askja worked example. Propagation
+      and inundation from a 2D nonlinear shallow-water model on a 30 m NZTM2000 grid,
+      verified against the analytic long-wave celerity. Topography from Copernicus GLO-30
+      (© ESA / Airbus). Active fault traces queried live from the GNS Science New Zealand
+      Active Faults Database.</p>
+      <p><span class="lbl">Key sources</span><br>
+      AF8 <em>Alpine Fault Magnitude 8 Hazard Scenario</em> (2016) ·
+      Hancox, GNS Science Consultancy Report 2012/146 ·
+      Tonkin &amp; Taylor, <em>Head of Lake Wakatipu Natural Hazards Assessment</em> (2021) ·
+      Howarth et al., <em>Nature Geoscience</em> (2021) ·
+      Synolakis, <em>J. Fluid Mech.</em> (1987) ·
+      Wells &amp; Coppersmith, <em>BSSA</em> (1994).</p>
+      <p style="margin-top:1.6em; color:var(--muted)">Code and data:
+        <a href="https://github.com/margotercier/Lake-tsunami-scenarios">github.com/margotercier/Lake-tsunami-scenarios</a></p>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* Model output is injected here by src/build_site.py so the page and the
+   repository can never drift apart. */
+const DATA = window.__HAWEA__ || null;
+
+function el(h){const t=document.createElement("template");t.innerHTML=h.trim();return t.content;}
+
+function renderStrip(d){
+  const s=document.getElementById("strip");
+  if(!d){s.remove();return;}
+  const items=[
+    ["392 m","maximum depth of Lake Hāwea"],
+    [d.town_peak_s2+" m","wave at the township, 5×10⁶ m³ slide",true],
+    [d.arrival_s2+" min","warning time from slide to township"],
+    [d.seiche1+" min","the lake's fundamental seiche period"],
+    ["75%","chance of an Alpine Fault rupture within 50 years"]
+  ];
+  s.innerHTML=items.map(([n,k,hot])=>
+    `<div class="stat"><div class="n${hot?" hot":""}">${n}</div><div class="k">${k}</div></div>`).join("");
+}
+
+function renderResults(d){
+  const t=document.getElementById("results");
+  if(!d){t.remove();return;}
+  const rows=d.scenarios.map(r=>`<tr>
+      <td><b>${r.label}</b></td><td class="num">${r.volume}</td>
+      <td class="num">${r.P}</td><td class="num">${r.H_M} m</td>
+      <td class="num">${r.max_wave} m</td>
+      <td class="num"><span class="hot">${r.town_max} m</span></td>
+      <td class="num">${r.arrival}</td><td class="num">${r.dam_max} m</td>
+      <td class="num">${r.inund} km²</td></tr>`).join("");
+  t.innerHTML=`<div class="tw"><table>
+    <thead><tr><th>Scenario</th><th class="num">Volume</th><th class="num">P</th>
+      <th class="num">Near-field wave</th><th class="num">Peak on lake</th>
+      <th class="num">At township</th><th class="num">Arrival</th>
+      <th class="num">At dam</th><th class="num">Land flooded</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <caption>Modelled results. “Near-field wave” is the Heller maximum wave height in the
+      impact zone; “at township” is the peak water level above normal lake level at the
+      Lake Hāwea foreshore.</caption></table></div>`;
+}
+
+function renderTectonic(d){
+  const t=document.getElementById("tectonic");
+  if(!d||!d.tectonic){t.remove();return;}
+  const q=d.tectonic;
+  t.innerHTML=`<figure>
+      <img src="figures/07_tectonic.png" alt="Map of Lake Hāwea showing the modelled wave field from a rupture of the Hunter Valley Fault beneath the lake, with the mapped fault trace, alongside water level time series.">
+      <figcaption><b>The second mechanism.</b> A rupture of the Hunter Valley Fault
+        beneath the lake — the source AF8 names for Hāwea — displacing the lakebed by
+        ${q.uz_max} m on the hanging wall. Peak wave ${q.max_wave} m; ${q.town} m at the
+        township. Smaller than the big landslide cases, but lake-wide and immediate:
+        the whole water surface is displaced at once, so there is almost no travel time
+        at the southern end.</figcaption></figure>`;
+}
+
+function renderSeiche(d){
+  const p=document.getElementById("seicheline");
+  if(!d){p.remove();return;}
+  p.innerHTML=`The fundamental period is <b>${d.seiche1} minutes</b>, with higher modes at
+    ${d.seiche_rest} minutes. For comparison, the classical Merian approximation for a
+    rectangular basin of the same length and mean depth gives ${d.merian} minutes.`;
+}
+
+renderStrip(DATA); renderResults(DATA); renderTectonic(DATA); renderSeiche(DATA);
+</script>

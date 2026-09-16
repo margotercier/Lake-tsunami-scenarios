@@ -11,7 +11,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize, LightSource
-from matplotlib.lines import Line2D
+import matplotlib.patheffects as pe
 
 DATA, OUT = "/home/user/Lake-tsunami-scenarios/data", "/home/user/Lake-tsunami-scenarios/outputs"
 FIG = "/home/user/Lake-tsunami-scenarios/outputs/figures"
@@ -19,6 +19,7 @@ os.makedirs(FIG, exist_ok=True)
 RES, LAKE_LEVEL, XMIN, YMAX = 30.0, 345.0, 1292000.0, 5096000.0
 SUB = (80, 1520, 100, 990)
 
+COARSEN = 5          # must match seiche_modes.py
 BLUE  = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
 ORANGE = ["#fde3d6", "#f9bfa4", "#f39a74", "#eb6834", "#c94f1f", "#a03d16", "#782d0f"]
 ORDINAL3 = ["#86b6ef", "#2a78d6", "#104281"]     # ordinal blue steps 250/450/650
@@ -27,6 +28,8 @@ CMAP_L = LinearSegmentedColormap.from_list("inund", ORANGE)
 INK, INK2 = "#0b0b0b", "#52514e"
 
 PLACES = {"Lake Hāwea township": (1302581, 5053435), "Hāwea dam": (1302244, 5052629)}
+LABEL_OFF = {"Lake Hāwea township": (8, 6), "Hāwea dam": (-10, -14)}
+LABEL_HA  = {"Lake Hāwea township": "left", "Hāwea dam": "right"}
 SCENARIOS = ["S1_moderate", "S2_large", "S3_extreme"]
 LABELS = {"S1_moderate": "S1  moderate  5×10⁵ m³",
           "S2_large":    "S2  large  5×10⁶ m³",
@@ -70,10 +73,11 @@ def annotate_places(ax, fs=8, which=None):
             continue
         r, c = to_rc(x, y)
         ax.plot(c, r, "o", ms=5, mfc="#ffffff", mec=INK, mew=1.4, zorder=6)
-        ax.annotate(name, (c, r), textcoords="offset points", xytext=(7, 4),
+        ax.annotate(name, (c, r), textcoords="offset points",
+                    xytext=LABEL_OFF.get(name, (7, 4)),
+                    ha=LABEL_HA.get(name, "left"),
                     fontsize=fs, color=INK, zorder=6,
-                    path_effects=[__import__("matplotlib.patheffects", fromlist=["x"])
-                                  .withStroke(linewidth=2.5, foreground="white")])
+                    path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
 
 
 # ------------------------------------------------------------------ figure 1
@@ -108,17 +112,18 @@ def fig_overview(dem, lake, depth, hs):
                              f"inundated {np.isfinite(inund).sum()*RES*RES/1e6:.2f} km²",
                 transform=ax.transAxes, fontsize=8.5, color=INK2, va="bottom",
                 bbox=dict(fc="white", ec="none", alpha=.8, pad=3))
-    cb1 = fig.colorbar(im, ax=axes, location="bottom", fraction=.035, pad=.01, aspect=55)
-    cb1.set_label("maximum wave height on the lake (m above normal level)", fontsize=9)
     cb2 = fig.colorbar(il, ax=axes, location="bottom", fraction=.035, pad=.02, aspect=55)
     cb2.set_label("maximum inundation depth on land (m)", fontsize=9)
+    cb1 = fig.colorbar(im, ax=axes, location="bottom", fraction=.035, pad=.01, aspect=55)
+    cb1.set_label("maximum wave height on the lake (m above normal level)", fontsize=9)
     for cb in (cb1, cb2):
         cb.ax.tick_params(labelsize=8, colors=INK2)
+    fig.get_layout_engine().set(rect=(0, 0, 1, 0.935))
     fig.suptitle("Lake Hāwea landslide-tsunami scenarios — modelled maximum wave field",
-                 fontsize=14, color=INK)
-    fig.text(0.5, 0.955, "Alpine Fault–triggered rock avalanche entering the lake at the "
+                 fontsize=14, color=INK, y=0.995)
+    fig.text(0.5, 0.952, "Alpine Fault–triggered rock avalanche entering the lake at the "
              "★ (mid-lake east shore, the highest-ranked source zone)",
-             ha="center", fontsize=9.5, color=INK2)
+             ha="center", fontsize=9.5, color=INK2, va="top")
     fig.savefig(f"{FIG}/01_overview.png", dpi=150, facecolor="white")
     plt.close(fig)
     print("wrote 01_overview.png")
@@ -218,20 +223,26 @@ def fig_gauges():
 # ------------------------------------------------------------------ figure 5
 def fig_seiche(lake, hs):
     info = json.load(open(f"{DATA}/seiche_modes.json"))
-    ny, nx = lake.shape
-    fig, axes = plt.subplots(1, 4, figsize=(13, 8), constrained_layout=True)
+    ny, nx = np.load(f"{DATA}/dem.npy").shape          # full-grid shape, pre-SUB
+    fig, axes = plt.subplots(1, 4, figsize=(13, 6.6), constrained_layout=True)
     div = LinearSegmentedColormap.from_list("div", ["#184f95", "#6da7ec", "#f0efec",
                                                     "#f39a74", "#a03d16"])
     for k, ax in enumerate(axes, start=1):
-        sh = np.load(f"{DATA}/seiche_mode{k}.npy")
-        sh = sh[SUB[0]:SUB[1], SUB[2]:SUB[3]]
+        # modes are solved on a 5x-coarsened grid: upsample back before slicing
+        coarse = np.load(f"{DATA}/seiche_mode{k}.npy")
+        full = np.kron(coarse, np.ones((COARSEN, COARSEN), dtype="float32"))
+        pad = np.full((ny, nx), np.nan, dtype="float32")
+        h_, w_ = min(full.shape[0], ny), min(full.shape[1], nx)
+        pad[:h_, :w_] = full[:h_, :w_]
+        sh = pad[SUB[0]:SUB[1], SUB[2]:SUB[3]]
         ax.imshow(hs, cmap="gray", vmin=0, vmax=1.4, origin="upper", interpolation="bilinear")
-        ax.imshow(sh, cmap=div, vmin=-1, vmax=1, origin="upper", interpolation="bilinear")
+        ax.imshow(sh, cmap=div, vmin=-1, vmax=1, origin="upper", interpolation="nearest")
         T = info["modes"][k - 1]["period_min"]
         ax.set_title(f"mode {k}\nT = {T:.1f} min", fontsize=10.5, color=INK)
         ax.set_xticks([]); ax.set_yticks([])
+    fig.get_layout_engine().set(rect=(0, 0.10, 1, 0.93))
     fig.suptitle("Lake Hāwea natural seiche modes (free oscillations of the basin)",
-                 fontsize=13, color=INK)
+                 fontsize=13, color=INK, y=0.995)
     fig.text(.5, .035, "Blue and orange are opposite phases of the standing wave; the "
              "shoreline between them is a node.\nStrong, long-period shaking in an Alpine "
              "Fault rupture can excite these modes, which then ring for hours.",
@@ -261,7 +272,6 @@ def fig_volume_height():
             zorder=2, label=f"power-law fit  R ∝ V^{k[0]:.2f}")
     for s, col in zip(SCENARIOS, ORDINAL3):
         m = json.load(open(f"{OUT}/{s}_meta.json"))
-        me = np.load(f"{OUT}/{s}_maxeta.npy")
         ax.scatter([m["scenario"]["volume"] / 1e6], [m["H_M"]], s=130, color=col,
                    zorder=6, marker="D", edgecolor="white", lw=1.4)
         ax.annotate(f'  {s.split("_")[0]}: near-field {m["H_M"]:.0f} m', 
@@ -281,6 +291,63 @@ def fig_volume_height():
     print("wrote 06_volume_vs_height.png")
 
 
+# ------------------------------------------------------------------ figure 7
+def fig_tectonic(dem, lake, depth, hs):
+    """Hunter Valley Fault rupture: whole-lake field and township detail."""
+    if not os.path.exists(f"{OUT}/S4_tectonic_maxeta.npy"):
+        print("skip 07: S4 not run"); return
+    me = np.load(f"{OUT}/S4_tectonic_maxeta.npy")
+    meta = json.load(open(f"{OUT}/S4_tectonic_meta.json"))
+    zb = np.where(lake, LAKE_LEVEL - depth, dem)
+    wave = np.where(lake & np.isfinite(me), me - LAKE_LEVEL, np.nan)
+    inund = np.where((~lake) & np.isfinite(me) & (me > zb + 0.1), me - zb, np.nan)
+    ny, nx = dem.shape
+    fig = plt.figure(figsize=(12.5, 8.6), constrained_layout=True)
+    gs = fig.add_gridspec(1, 2, width_ratios=[1, 1.25])
+    ax = fig.add_subplot(gs[0, 0])
+    base_axes(ax, hs, lake, (0, nx, ny, 0))
+    im = ax.imshow(wave, cmap=CMAP_W, norm=Normalize(0, max(1.0, np.nanpercentile(wave, 99.5))),
+                   extent=(0, nx, ny, 0), origin="upper")
+    # mapped fault trace
+    from pyproj import Transformer
+    fl = json.load(open(f"{DATA}/faults_near_hawea.json"))["Hunter Valley Fault"]["pts"]
+    tr = Transformer.from_crs(4326, 2193, always_xy=True)
+    fxs, fys = tr.transform(np.array(fl)[:, 0], np.array(fl)[:, 1])
+    rr, cc = to_rc(np.array(fxs), np.array(fys))
+    ax.plot(cc, rr, ".", ms=2.0, color="#e34948", zorder=7)
+    ax.plot([], [], "-", color="#e34948", lw=2, label="Hunter Valley Fault (NZAFD)")
+    ax.legend(frameon=False, fontsize=8.5, loc="upper left")
+    annotate_places(ax, fs=8.5)
+    cb = fig.colorbar(im, ax=ax, fraction=.04, pad=.02)
+    cb.set_label("maximum wave height (m)", fontsize=9)
+    cb.ax.tick_params(labelsize=8, colors=INK2)
+    ax.set_title(f"S4 · Hunter Valley Fault rupture\n{meta['uz_max']:+.1f} m / "
+                 f"{meta['uz_min']:+.1f} m lakebed displacement", fontsize=11, color=INK)
+
+    ax2 = fig.add_subplot(gs[0, 1])
+    m2 = json.load(open(f"{OUT}/S4_tectonic_meta.json"))
+    t = np.array(m2["times"]) / 60.0
+    for key, col, lab in (("Hawea township", ORDINAL3[1], "Lake Hāwea township"),
+                          ("Hawea dam", ORDINAL3[2], "Hāwea dam")):
+        y = np.array(m2["gauges"][key])
+        ax2.plot(t, y, lw=2, color=col, label=lab)
+        ax2.annotate(lab, (t[-1], y[-1]), fontsize=8.5, color=col, xytext=(4, 0),
+                     textcoords="offset points", va="center")
+    ax2.axhline(0, color="#c9c8c3", lw=1)
+    ax2.set_xlabel("time after rupture (minutes)", fontsize=9, color=INK2)
+    ax2.set_ylabel("water level anomaly (m)", fontsize=9, color=INK2)
+    ax2.grid(True, color="#ecebe7", lw=.8); ax2.set_axisbelow(True)
+    for sp in ("top", "right"):
+        ax2.spines[sp].set_visible(False)
+    ax2.legend(frameon=False, fontsize=9)
+    ax2.set_title("Water level at the southern end", fontsize=11, color=INK, loc="left")
+    fig.suptitle("Scenario S4 — co-seismic rupture of the Hunter Valley Fault beneath "
+                 "Lake Hāwea", fontsize=13, color=INK)
+    fig.savefig(f"{FIG}/07_tectonic.png", dpi=150, facecolor="white")
+    plt.close(fig)
+    print("wrote 07_tectonic.png")
+
+
 if __name__ == "__main__":
     dem, lake, depth = load()
     hs = hillshade(dem)
@@ -290,3 +357,4 @@ if __name__ == "__main__":
     fig_gauges()
     fig_seiche(lake, hs)
     fig_volume_height()
+    fig_tectonic(dem, lake, depth, hs)
