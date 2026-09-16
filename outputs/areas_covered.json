@@ -1,0 +1,25 @@
+{
+  "township": {
+    "title": "Lake H\u0101wea township, outlet and dam",
+    "S1": 0.03,
+    "S2": 0.06,
+    "S3": 0.13
+  },
+  "head": {
+    "title": "Head of the lake \u2014 Hunter River delta",
+    "S1": 0.01,
+    "S2": 0.26,
+    "S3": 0.98
+  },
+  "slide": {
+    "title": "The slide zone \u2014 mid-lake east shore",
+    "S1": 0.15,
+    "S2": 0.3,
+    "S3": 0.47
+  },
+  "_total": {
+    "S1_moderate": 1.16,
+    "S2_large": 2.74,
+    "S3_extreme": 5.19
+  }
+}

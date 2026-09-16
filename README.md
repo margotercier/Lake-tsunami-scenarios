@@ -202,7 +202,19 @@ After the first wave the basin rings. Solving the eigenvalue problem on the real
 
 This matters for response: **the hazard does not end when the first wave has passed.** Water keeps sloshing at these periods for hours, and the second or third oscillation can be as dangerous as the first for anyone who has gone back to the shore.
 
+### What gets covered
+
+Most of Hāwea's shoreline is too steep for water to travel far inland, so the flooded strip is narrow almost everywhere. The exceptions are the deltas — and the deltas are where the flat, usable land is.
+
+- **Lake Hāwea township** sits on a terrace above the lake. What floods is the foreshore, the boat ramp and the outlet channel below the dam — 0.03 km² in S1 rising to 0.13 km² in S3, not the town itself.
+- **The head of the lake (Hunter River delta)** is the largest area covered anywhere on Hāwea: shallow water spreading over 0.98 km² of flats in S3.
+- **The slide zone itself** takes run-up of tens of metres onto steep ground — little area, total destruction.
+
 ### Maps and animation
+
+**What actually gets covered — nested flood extents at the places that matter**
+
+![What actually gets covered — nested flood extents at the places that matter](outputs/figures/08_areas_covered.png)
 
 **Maximum wave field, all three landslide scenarios**
 

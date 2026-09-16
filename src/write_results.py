@@ -19,6 +19,7 @@ def main():
     lp = json.load(open(f"{DATA}/lake_params.json"))
     sm = json.load(open(f"{DATA}/seiche_modes.json"))
     zones = json.load(open(f"{DATA}/eil_zones.json"))
+    ac = json.load(open(f"{OUT}/areas_covered.json"))
     L = []
     A = L.append
 
@@ -117,8 +118,23 @@ def main():
       "third oscillation can be as dangerous as the first for anyone who has gone back "
       "to the shore.\n")
 
+    A("### What gets covered\n")
+    A("Most of Hāwea's shoreline is too steep for water to travel far inland, so the "
+      "flooded strip is narrow almost everywhere. The exceptions are the deltas — and "
+      "the deltas are where the flat, usable land is.\n")
+    A("- **Lake Hāwea township** sits on a terrace above the lake. What floods is the "
+      "foreshore, the boat ramp and the outlet channel below the dam — "
+      f"{ac['township']['S1']:.2f} km² in S1 rising to {ac['township']['S3']:.2f} km² "
+      "in S3, not the town itself.")
+    A("- **The head of the lake (Hunter River delta)** is the largest area covered "
+      f"anywhere on Hāwea: shallow water spreading over {ac['head']['S3']:.2f} km² "
+      "of flats in S3.")
+    A("- **The slide zone itself** takes run-up of tens of metres onto steep ground — "
+      "little area, total destruction.\n")
     A("### Maps and animation\n")
-    figs = [("01_overview.png", "Maximum wave field, all three landslide scenarios"),
+    figs = [("08_areas_covered.png",
+             "What actually gets covered — nested flood extents at the places that matter"),
+            ("01_overview.png", "Maximum wave field, all three landslide scenarios"),
             ("02_township.png", "Lake Hāwea township inundation detail"),
             ("03_arrival.png", "Wave arrival time"),
             ("04_gauges.png", "Water-level time series"),
