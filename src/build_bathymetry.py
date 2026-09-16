@@ -17,6 +17,14 @@ MAX_DEPTH    = 392.0     # m, published
 MEAN_DEPTH   = 161.0     # m, published
 DELTA_TAPER_KM = 5.0     # Hunter delta infill length at the head
 
+# The Hawea River outlet is controlled by the Hawea dam (Contact Energy). At 30 m the
+# Copernicus DEM resolves the outlet channel but not the dam structure across it, so the
+# raw DEM leaves the lake hydraulically connected to the river ~7 m below lake level -
+# the lake drains through the gap from the first timestep. Enforce a crest across the
+# outlet. 348.0 m gives ~3 m of freeboard above the 345 m surface and sits just above the
+# 346 m top of the operating range; the true crest should be obtained from the dam owner.
+DAM_CREST_M = 348.0
+
 def main():
     dem = np.load(f"{DATA}/dem.npy")
     xmin, ymin, xmax, ymax, res, w, h = open(f"{DATA}/grid.txt").read().split()
@@ -56,8 +64,26 @@ def main():
     print(f"depth: max {depth.max():.0f} m, mean(lake) {depth[lake].mean():.0f} m, "
           f"volume {depth.sum()*res*res/1e9:.1f} km3")
 
+    # --- seal the outlet so the lake does not drain through the DEM gap ----------
+    zb_land = dem.copy()
+    below = (~lake) & (dem < LAKE_LEVEL)
+    ring = ndimage.binary_dilation(lake, np.ones((3, 3))) & below
+    n_leak = int(ring.sum())
+    if n_leak:
+        barrier = ndimage.binary_dilation(ring, np.ones((3, 3))) & (~lake)
+        zb_land[barrier] = np.maximum(zb_land[barrier], DAM_CREST_M)
+        print(f"outlet: sealed {n_leak} leak cells "
+              f"({barrier.sum()} cells raised to {DAM_CREST_M} m)")
+    # verify nothing below lake level is still connected
+    below2 = (~lake) & (zb_land < LAKE_LEVEL)
+    chk = ndimage.binary_dilation(lake, np.ones((3, 3))) & below2
+    grew = int(chk.sum())
+    print(f"  remaining connected sub-lake-level cells: {grew} "
+          f"({'OK' if grew == 0 else 'STILL LEAKING'})")
+
     np.save(f"{DATA}/lake_mask.npy", lake)
     np.save(f"{DATA}/depth.npy", depth)
+    np.save(f"{DATA}/zb_land.npy", zb_land.astype("float32"))
 
     prof = dict(driver="GTiff", height=int(h), width=int(w), count=1, dtype="float32",
                 crs="EPSG:2193",

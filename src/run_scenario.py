@@ -31,9 +31,10 @@ SCENARIOS = {
 GAUGES = {
     "Hawea township": (1302581, 5053435),
     "Hawea dam":      (1302244, 5052629),
-    "The Neck":       (1299146, 5067481),
-    "Head of lake":   (1306600, 5081735),
+    "The Neck":       (1301033, 5066822),
+    "Head of lake":   (1313722, 5086314),
 }
+GAUGE_MIN_DEPTH = 10.0      # snap to water this deep so a gauge cannot dry out
 
 
 def rc(x, y):
@@ -51,7 +52,9 @@ def main(name, duration=1800.0, snap_every=10.0):
     ny, nx = dem.shape
 
     # bed elevation: lake bed under the lake, DEM surface on land
-    zb = np.where(lake, LAKE_LEVEL - depth, dem).astype(np.float64)
+    # zb_land carries the enforced dam crest at the outlet (see build_bathymetry.py)
+    zb_land = np.load(f"{DATA}/zb_land.npy")[r0:r1, c0:c1]
+    zb = np.where(lake, LAKE_LEVEL - depth, zb_land).astype(np.float64)
     eta = np.where(lake, LAKE_LEVEL, zb).astype(np.float64)
 
     # --- source ----------------------------------------------------------
@@ -97,13 +100,15 @@ def main(name, duration=1800.0, snap_every=10.0):
     maxeta = np.full_like(eta, -1e9)
     arrival = np.full(eta.shape, np.nan, dtype="float32")
     # snap each gauge to the nearest lake cell so it records water level, not dry ground
-    ly, lx = np.where(lake)
+    deep = lake & (depth >= GAUGE_MIN_DEPTH)
+    ly, lx = np.where(deep)
     gid = {}
     for k, v in GAUGES.items():
         gr, gc = rc(*v); gr -= r0; gc -= c0
         j = int(np.argmin((ly - gr) ** 2 + (lx - gc) ** 2))
         gid[k] = (int(ly[j]), int(lx[j]))
-        print(f"  gauge {k:15s} snapped {np.hypot(ly[j]-gr, lx[j]-gc)*RES:.0f} m to lake cell")
+        print(f"  gauge {k:15s} snapped {np.hypot(ly[j]-gr, lx[j]-gc)*RES:5.0f} m, "
+              f"depth {depth[gid[k]]:.1f} m")
     series = {k: [] for k in gid}
     times, snaps = [], []
     nsnap = 0

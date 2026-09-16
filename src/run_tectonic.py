@@ -31,7 +31,9 @@ SUBSIDE_M  = 0.3      # max footwall (west) subsidence, m
 WIDTH_M    = 1500.0   # across-strike smoothing half-width, m
 TAPER_M    = 3000.0   # along-strike taper beyond the mapped rupture, m
 
-GAUGES = {"Hawea township": (1302581, 5053435), "Hawea dam": (1302244, 5052629)}
+GAUGES = {"Hawea township": (1302581, 5053435), "Hawea dam": (1302244, 5052629),
+          "The Neck": (1301033, 5066822), "Head of lake": (1313722, 5086314)}
+GAUGE_MIN_DEPTH = 10.0
 
 
 def rc(x, y):
@@ -72,7 +74,8 @@ def main(duration=1500.0, snap_every=8.0):
     uz = (UPLIFT_M * 0.5 * (1 + th) - SUBSIDE_M * 0.5 * (1 - th)) * taper
     uz -= np.average(uz, weights=lake) * 0.0     # keep absolute displacement, not demeaned
 
-    zb = np.where(lake, LAKE_LEVEL - depth, dem).astype(np.float64)
+    zb_land = np.load(f"{DATA}/zb_land.npy")[r0:r1, c0:c1]
+    zb = np.where(lake, LAKE_LEVEL - depth, zb_land).astype(np.float64)
     # the lake bed moves with the ground; the free surface inherits that displacement
     zb_new = zb + np.where(lake, uz, 0.0)
     eta = np.where(lake, LAKE_LEVEL + uz, zb_new).astype(np.float64)
@@ -87,7 +90,8 @@ def main(duration=1500.0, snap_every=8.0):
 
     maxeta = np.full_like(eta, -1e9)
     arrival = np.full(eta.shape, np.nan, dtype="float32")
-    ly, lx = np.where(lake)
+    deep = lake & (depth >= GAUGE_MIN_DEPTH)
+    ly, lx = np.where(deep)
     gid = {}
     for k, v in GAUGES.items():
         gr, gc = rc(*v); gr -= r0; gc -= c0
