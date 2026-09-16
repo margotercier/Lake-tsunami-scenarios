@@ -461,13 +461,16 @@ function renderResults(d){
       <td class="num">${r.P}</td><td class="num">${r.H_M} m</td>
       <td class="num">${r.max_wave} m</td>
       <td class="num"><span class="hot">${r.town_max} m</span></td>
-      <td class="num">${r.arrival}</td><td class="num">${r.dam_max} m</td>
+      <td class="num">${r.arrival}</td><td class="num">${r.peak_min} min</td>
+      <td class="num">${r.dam_max} m</td>
+      <td class="num">${r.overtop==="no"?"no":`<span class="hot">${r.overtop}</span>`}</td>
       <td class="num">${r.inund} km²</td></tr>`).join("");
   t.innerHTML=`<div class="tw"><table>
     <thead><tr><th>Scenario</th><th class="num">Volume</th><th class="num">P</th>
       <th class="num">Near-field wave</th><th class="num">Peak on lake</th>
-      <th class="num">At township</th><th class="num">Arrival</th>
-      <th class="num">At dam</th><th class="num">Land flooded</th></tr></thead>
+      <th class="num">At township</th><th class="num">First arrival</th>
+      <th class="num">Largest wave at</th><th class="num">At dam</th>
+      <th class="num">Dam overtops</th><th class="num">Land flooded</th></tr></thead>
     <tbody>${rows}</tbody>
     <caption>Modelled results. “Near-field wave” is the Heller maximum wave height in the
       impact zone; “at township” is the peak water level above normal lake level at the

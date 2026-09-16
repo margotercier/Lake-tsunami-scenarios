@@ -27,6 +27,8 @@ def main():
                         arrival=(f"{r['town_arrival_min']:.0f} min"
                                  if r["town_arrival_min"] else "—"),
                         dam_max=round(r["dam_max"], 1),
+                        peak_min=round(r["town_peak_min"]),
+                        overtop=(f"+{r['dam_overtop_m']:.2f} m" if r["overtops"] else "no"),
                         inund=round(r["inund_km2"], 2)) for r in rows],
         town_peak_s2=round(by["S2_large"]["town_max"], 1),
         arrival_s2=(f"{by['S2_large']['town_arrival_min']:.0f}"
@@ -34,6 +36,11 @@ def main():
         seiche1=round(sm["modes"][0]["period_min"]),
         seiche_rest=", ".join(f"{m['period_min']:.0f}" for m in sm["modes"][1:5]),
         merian=round(sm["merian_T1_s"] / 60),
+        arrival_lo=round(min(r["town_arrival_min"] for r in rows if r["town_arrival_min"])),
+        arrival_hi=round(max(r["town_arrival_min"] for r in rows if r["town_arrival_min"])),
+        peak_lo=round(min(r["town_peak_min"] for r in rows)),
+        peak_hi=round(max(r["town_peak_min"] for r in rows)),
+        overtoppers=[r["scenario"].split("_")[0] for r in rows if r["overtops"]],
     )
 
     if os.path.exists(f"{OUT}/S2_large_animation.mp4"):
