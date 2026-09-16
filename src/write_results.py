@@ -122,6 +122,15 @@ def main():
     A("Most of Hāwea's shoreline is too steep for water to travel far inland, so the "
       "flooded strip is narrow almost everywhere. The exceptions are the deltas — and "
       "the deltas are where the flat, usable land is.\n")
+    th = json.load(open(f"{OUT}/township_hires_ha.json")) if os.path.exists(
+        f"{OUT}/township_hires_ha.json") else None
+    if th:
+        A("At the township the 30 m model was refined with **LINZ 1 m LiDAR and 0.1 m "
+          "aerial imagery**, both fetched from LINZ's open S3 buckets. On that footing "
+          f"the covered frontage is **{th['S1_moderate']} ha (S1), "
+          f"{th['S2_large']} ha (S2), {th['S3_extreme']} ha (S3)** — the beach, the boat "
+          "ramp, the reserve and the lowest row of the foreshore, stopping short of the "
+          "terrace the town is built on.\n")
     A("- **Lake Hāwea township** sits on a terrace above the lake. What floods is the "
       "foreshore, the boat ramp and the outlet channel below the dam — "
       f"{ac['township']['S1']:.2f} km² in S1 rising to {ac['township']['S3']:.2f} km² "
@@ -132,7 +141,9 @@ def main():
     A("- **The slide zone itself** takes run-up of tens of metres onto steep ground — "
       "little area, total destruction.\n")
     A("### Maps and animation\n")
-    figs = [("08_areas_covered.png",
+    figs = [("09_township_hires.png",
+             "Lake Hāwea township foreshore at 0.5 m, on LINZ aerial imagery and LiDAR"),
+            ("08_areas_covered.png",
              "What actually gets covered — nested flood extents at the places that matter"),
             ("01_overview.png", "Maximum wave field, all three landslide scenarios"),
             ("02_township.png", "Lake Hāwea township inundation detail"),

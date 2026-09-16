@@ -43,6 +43,9 @@ def main():
         overtoppers=[r["scenario"].split("_")[0] for r in rows if r["overtops"]],
     )
 
+    if os.path.exists(f"{OUT}/township_hires_ha.json"):
+        payload["township_ha"] = json.load(open(f"{OUT}/township_hires_ha.json"))
+
     if os.path.exists(f"{OUT}/S2_large_animation.mp4"):
         payload["video"] = "S2_large_animation.mp4"
 

@@ -20,6 +20,7 @@ python3 src/run_tectonic.py 1500
 python3 src/summarise.py
 python3 src/make_maps.py
 python3 src/make_inundation_maps.py
+python3 src/township_hires.py       # 1 m LiDAR + 0.1 m imagery at the township
 python3 src/make_animation.py S2_large S3_extreme
 python3 src/write_results.py      # fills the Results section of README.md
 python3 src/build_site.py         # builds the shareable page in site/

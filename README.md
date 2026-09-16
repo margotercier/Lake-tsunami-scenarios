@@ -206,11 +206,17 @@ This matters for response: **the hazard does not end when the first wave has pas
 
 Most of Hāwea's shoreline is too steep for water to travel far inland, so the flooded strip is narrow almost everywhere. The exceptions are the deltas — and the deltas are where the flat, usable land is.
 
+At the township the 30 m model was refined with **LINZ 1 m LiDAR and 0.1 m aerial imagery**, both fetched from LINZ's open S3 buckets. On that footing the covered frontage is **3.64 ha (S1), 5.82 ha (S2), 7.65 ha (S3)** — the beach, the boat ramp, the reserve and the lowest row of the foreshore, stopping short of the terrace the town is built on.
+
 - **Lake Hāwea township** sits on a terrace above the lake. What floods is the foreshore, the boat ramp and the outlet channel below the dam — 0.03 km² in S1 rising to 0.13 km² in S3, not the town itself.
 - **The head of the lake (Hunter River delta)** is the largest area covered anywhere on Hāwea: shallow water spreading over 0.98 km² of flats in S3.
 - **The slide zone itself** takes run-up of tens of metres onto steep ground — little area, total destruction.
 
 ### Maps and animation
+
+**Lake Hāwea township foreshore at 0.5 m, on LINZ aerial imagery and LiDAR**
+
+![Lake Hāwea township foreshore at 0.5 m, on LINZ aerial imagery and LiDAR](outputs/figures/09_township_hires.png)
 
 **What actually gets covered — nested flood extents at the places that matter**
 
