@@ -51,17 +51,39 @@ def main():
     A("\nScenarios S1–S3 all place the slide in **zone 4**, the highest-ranked "
       "(38.5° mean slope, 1125 m of relief, 17 km up-lake from the township).\n")
 
-    A("<!--ANCHOR-RESULTS-->\n## 5. Results\n")
+    A("## 5. Results\n")
     A("### Landslide scenarios\n")
-    A("| | Volume | P | Near-field wave H_M | Peak on the lake | Township peak | "
-      "Arrival at township | Dam peak | Land inundated |")
-    A("|---|---|---|---|---|---|---|---|---|")
+    A("| | Volume | P | Near-field H_M | Peak on lake | At township | First arrival | "
+      "Largest wave at | At dam | Dam overtops | Land flooded |")
+    A("|---|---|---|---|---|---|---|---|---|---|---|")
     for r in rows:
         arr = (f"{r['town_arrival_min']:.0f} min" if r["town_arrival_min"] else "—")
+        ot = f"**+{r['dam_overtop_m']:.2f} m**" if r["overtops"] else "no"
         A(f"| {NAMES[r['scenario']]} | {VOLS[r['scenario']]} | {r['P']:.2f} | "
           f"{r['H_M']:.0f} m | {r['max_wave']:.0f} m | **{r['town_max']:.1f} m** | "
-          f"{arr} | {r['dam_max']:.1f} m | {r['inund_km2']:.2f} km² |")
+          f"{arr} | {r['town_peak_min']:.0f} min | {r['dam_max']:.1f} m | {ot} | "
+          f"{r['inund_km2']:.2f} km² |")
     A("")
+    A("Two results matter more than the headline heights.\n")
+    A("**The first wave is not the biggest.** At the township the leading wave arrives in "
+      f"{min(r['town_arrival_min'] for r in rows if r['town_arrival_min']):.0f}–"
+      f"{max(r['town_arrival_min'] for r in rows if r['town_arrival_min']):.0f} minutes at "
+      "only 1–1.5 m, and the level then oscillates with *growing* amplitude, peaking "
+      f"{rows[1]['town_peak_min']:.0f}–{rows[0]['town_peak_min']:.0f} minutes after the "
+      "slide. This is energy being redistributed into the southern basin, not numerical "
+      "instability: lake-wide wave energy decays monotonically to about a quarter of its "
+      "initial value over the same period, and the largest amplitude anywhere is at t = 0. "
+      "For evacuation planning this inverts the usual instinct — the shore is *more* "
+      "dangerous twenty minutes in than at first arrival.\n")
+    dam = [r for r in rows if r["overtops"]]
+    if dam:
+        A("**The dam overtops in the larger scenarios.** With the assumed 348.0 m crest "
+          "(3 m of freeboard), " + " and ".join(NAMES[r["scenario"]] for r in dam) +
+          " overtop, by " + " and ".join(f"{r['dam_overtop_m']:.2f} m" for r in dam) +
+          ". This is exactly the concern AF8 raises for Lake Hāwea. **It depends entirely "
+          "on the assumed crest elevation**, which is not public — the real figure from the "
+          "dam owner could move this result either way, and it is the single cheapest input "
+          "that would sharpen this study.\n")
 
     if os.path.exists(f"{OUT}/S4_tectonic_meta.json"):
         m4 = json.load(open(f"{OUT}/S4_tectonic_meta.json"))
@@ -108,11 +130,10 @@ def main():
             A(f"**{cap}**\n\n![{cap}](outputs/figures/{f})\n")
     for v in ("S2_large", "S3_extreme"):
         if os.path.exists(f"{OUT}/{v}_animation.mp4"):
-            A(f"Animation — `outputs/{v}_animation.mp4` "
-              f"(also `{v}_animation.gif`)\n")
+            A(f"Animation — `outputs/{v}_animation.mp4`\n")
 
     txt = "\n".join(L)
-    rd = open(f"{ROOT}/README.md").read()
+    rd = open(f"{ROOT}/README.template.md").read()
     rd = rd.replace("<!--RESULTS-->", txt)
     open(f"{ROOT}/README.md", "w").write(rd)
     print(f"README.md updated ({len(txt)} chars of results)")

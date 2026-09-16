@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap, Normalize, LightSource
+from matplotlib.colors import LinearSegmentedColormap, Normalize, LightSource, PowerNorm
 import matplotlib.patheffects as pe
 
 DATA, OUT = "/home/user/Lake-tsunami-scenarios/data", "/home/user/Lake-tsunami-scenarios/outputs"
@@ -99,31 +99,33 @@ def fig_overview(dem, lake, depth, hs):
     for ax, s in zip(axes, SCENARIOS):
         wave, inund = fields[s]
         base_axes(ax, hs, lake, ext)
-        im = ax.imshow(wave, cmap=CMAP_W, norm=Normalize(0, vmax), extent=ext,
-                       origin="upper", interpolation="nearest")
+        im = ax.imshow(wave, cmap=CMAP_W, norm=PowerNorm(0.45, vmin=0, vmax=vmax),
+                       extent=ext, origin="upper", interpolation="nearest")
         il = ax.imshow(inund, cmap=CMAP_L, norm=Normalize(0, 8), extent=ext,
                        origin="upper", interpolation="nearest")
         meta = json.load(open(f"{OUT}/{s}_meta.json"))
         r, c = to_rc(*meta["impact_xy"])
         ax.plot(c, r, marker="*", ms=17, mfc="#e34948", mec="white", mew=1.2, zorder=7)
         annotate_places(ax)
-        ax.set_title(LABELS[s], fontsize=11, color=INK, pad=8)
-        ax.text(0.03, 0.015, f"max wave {np.nanmax(wave):.0f} m\n"
-                             f"inundated {np.isfinite(inund).sum()*RES*RES/1e6:.2f} km²",
-                transform=ax.transAxes, fontsize=8.5, color=INK2, va="bottom",
-                bbox=dict(fc="white", ec="none", alpha=.8, pad=3))
+        ax.set_title(LABELS[s], fontsize=11, color=INK, pad=10)
+        ax.text(0.035, 0.972, f"peak wave  {np.nanmax(wave):.0f} m\n"
+                              f"inundated  {np.isfinite(inund).sum()*RES*RES/1e6:.2f} km²",
+                transform=ax.transAxes, fontsize=8.5, color=INK2, va="top", ha="left",
+                linespacing=1.5,
+                bbox=dict(fc="white", ec="#dcdfdb", alpha=.9, pad=4, boxstyle="round,pad=0.4"))
     cb2 = fig.colorbar(il, ax=axes, location="bottom", fraction=.035, pad=.02, aspect=55)
     cb2.set_label("maximum inundation depth on land (m)", fontsize=9)
-    cb1 = fig.colorbar(im, ax=axes, location="bottom", fraction=.035, pad=.01, aspect=55)
-    cb1.set_label("maximum wave height on the lake (m above normal level)", fontsize=9)
+    ticks = [t for t in (0, 1, 2, 5, 10, 20, 40, 60) if t <= vmax]
+    cb1 = fig.colorbar(im, ax=axes, location="bottom", fraction=.035, pad=.01,
+                       aspect=55, ticks=ticks)
+    cb1.ax.set_xticklabels([str(t) for t in ticks])
+    cb1.set_label("maximum wave height on the lake (m above normal level, square-root scale)  ·  "
+                  "★ = rock avalanche entering the lake on the mid-lake east shore",
+                  fontsize=9)
     for cb in (cb1, cb2):
         cb.ax.tick_params(labelsize=8, colors=INK2)
-    fig.get_layout_engine().set(rect=(0, 0, 1, 0.935))
     fig.suptitle("Lake Hāwea landslide-tsunami scenarios — modelled maximum wave field",
-                 fontsize=14, color=INK, y=0.995)
-    fig.text(0.5, 0.952, "Alpine Fault–triggered rock avalanche entering the lake at the "
-             "★ (mid-lake east shore, the highest-ranked source zone)",
-             ha="center", fontsize=9.5, color=INK2, va="top")
+                 fontsize=13.5, color=INK)
     fig.savefig(f"{FIG}/01_overview.png", dpi=150, facecolor="white")
     plt.close(fig)
     print("wrote 01_overview.png")
@@ -132,11 +134,11 @@ def fig_overview(dem, lake, depth, hs):
 # ------------------------------------------------------------------ figure 2
 def fig_township(dem, lake, depth, hs):
     r, c = to_rc(*PLACES["Lake Hāwea township"])
-    pad_y, pad_x = 150, 170
+    pad_y, pad_x = 115, 125
     r0, r1 = int(r - pad_y), int(r + pad_y // 2)
     c0, c1 = int(c - pad_x), int(c + pad_x)
     ext = (c0, c1, r1, r0)
-    fig, axes = plt.subplots(1, 3, figsize=(14, 6.4), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 5.3), constrained_layout=True)
     zb_full = np.where(lake, LAKE_LEVEL - depth, dem)
     for ax, s in zip(axes, SCENARIOS):
         me = np.load(f"{OUT}/{s}_maxeta.npy")
@@ -147,12 +149,15 @@ def fig_township(dem, lake, depth, hs):
         ax.imshow(np.where(lake, 1.0, np.nan)[r0:r1, c0:c1],
                   cmap=LinearSegmentedColormap.from_list("w", ["#e8eef5"] * 2),
                   extent=ext, origin="upper", alpha=.55)
-        ax.imshow(wave[r0:r1, c0:c1], cmap=CMAP_W, norm=Normalize(0, 12), extent=ext,
+        ax.imshow(wave[r0:r1, c0:c1], cmap=CMAP_W, norm=Normalize(0, 6), extent=ext,
                   origin="upper")
         il = ax.imshow(inund[r0:r1, c0:c1], cmap=CMAP_L, norm=Normalize(0, 8),
                        extent=ext, origin="upper")
-        a = np.isfinite(inund[r0:r1, c0:c1]).sum() * RES * RES / 1e6
-        ax.set_title(f"{LABELS[s]}\ninundated here: {a:.2f} km²", fontsize=10, color=INK)
+        win = inund[r0:r1, c0:c1]
+        a = np.isfinite(win).sum() * RES * RES / 1e6
+        dmax = np.nanmax(win) if np.isfinite(win).any() else 0.0
+        ax.set_title(f"{LABELS[s]}\n{a:.2f} km² flooded · up to {dmax:.1f} m deep",
+                     fontsize=10, color=INK)
         annotate_places(ax, fs=9)
         ax.set_xticks([]); ax.set_yticks([])
         # 1 km scale bar
@@ -187,6 +192,10 @@ def fig_arrival(lake, hs):
     cb.set_label("wave arrival time (minutes after slide impact)", fontsize=9)
     cb.ax.tick_params(labelsize=8, colors=INK2)
     ax.set_title("Wave arrival time — scenario S2 (5×10⁶ m³)", fontsize=12.5, color=INK)
+    ax.text(0.035, 0.015, "unshaded water = the 0.5 m arrival threshold\nwas never reached "
+            "there during the 30-minute run",
+            transform=ax.transAxes, fontsize=8.5, color=INK2, va="bottom", linespacing=1.5,
+            bbox=dict(fc="white", ec="#dcdfdb", alpha=.9, boxstyle="round,pad=0.4"))
     fig.savefig(f"{FIG}/03_arrival.png", dpi=150, facecolor="white")
     plt.close(fig)
     print("wrote 03_arrival.png")
@@ -316,7 +325,11 @@ def fig_tectonic(dem, lake, depth, hs):
     rr, cc = to_rc(np.array(fxs), np.array(fys))
     ax.plot(cc, rr, ".", ms=2.0, color="#e34948", zorder=7)
     ax.plot([], [], "-", color="#e34948", lw=2, label="Hunter Valley Fault (NZAFD)")
-    ax.legend(frameon=False, fontsize=8.5, loc="upper left")
+    # the mapped trace runs past the model domain - clip back to the map
+    ax.set_xlim(0, nx); ax.set_ylim(ny, 0)
+    leg = ax.legend(frameon=True, fontsize=8.5, loc="lower left", framealpha=.9,
+                    edgecolor="#dcdfdb")
+    leg.get_frame().set_linewidth(.8)
     annotate_places(ax, fs=8.5)
     cb = fig.colorbar(im, ax=ax, fraction=.04, pad=.02)
     cb.set_label("maximum wave height (m)", fontsize=9)

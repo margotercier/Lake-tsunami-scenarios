@@ -64,11 +64,12 @@ def build(name, fps=20):
     clock = ax.text(.03, .022, "", transform=ax.transAxes, fontsize=13, color=INK,
                     va="bottom", family="monospace",
                     path_effects=[pe.withStroke(linewidth=3, foreground="white")])
-    note = ax.text(.03, .075, "", transform=ax.transAxes, fontsize=8.5, color=INK2,
-                   va="bottom",
-                   path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
+    note = ax.text(.035, .975, "", transform=ax.transAxes, fontsize=9, color=INK2,
+                   va="top", ha="left",
+                   bbox=dict(fc="white", ec="#dcdfdb", alpha=.9, boxstyle="round,pad=0.35"))
     cb = fig.colorbar(im, ax=ax, fraction=.038, pad=.02)
-    cb.set_label("water surface relative to normal lake level (m)", fontsize=8.5)
+    cb.set_label("water surface relative to normal lake level (m)\n"
+                 "scale set for the far field — the impact wave is off-scale", fontsize=8)
     cb.ax.tick_params(labelsize=8, colors=INK2)
 
     frames = []
@@ -77,7 +78,7 @@ def build(name, fps=20):
         im.set_data(fr)
         clock.set_text(f"t = {int(t)//60:02d}:{int(t)%60:02d}")
         peak = np.nanmax(fr)
-        note.set_text(f"peak crest now: {peak:5.1f} m")
+        note.set_text(f"peak crest on the lake:  {peak:5.1f} m")
         fig.canvas.draw()
         buf = np.asarray(fig.canvas.buffer_rgba())[:, :, :3].copy()
         frames.append(buf)
@@ -87,9 +88,8 @@ def build(name, fps=20):
     imageio.mimwrite(mp4, frames, fps=fps, codec="libx264", quality=8,
                      macro_block_size=1, output_params=["-pix_fmt", "yuv420p"])
     print(f"wrote {mp4}  ({os.path.getsize(mp4)/1e6:.1f} MB)")
-    gif = f"{OUT}/{name}_animation.gif"
-    imageio.mimwrite(gif, frames[::2], fps=max(fps // 2, 8), loop=0)
-    print(f"wrote {gif}  ({os.path.getsize(gif)/1e6:.1f} MB)")
+    # No GIF: at this frame size a legible GIF runs to ~20 MB, which is worse than
+    # the 3 MB MP4 in every way that matters here.
     return mp4
 
 

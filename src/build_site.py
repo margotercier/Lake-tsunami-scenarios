@@ -36,6 +36,9 @@ def main():
         merian=round(sm["merian_T1_s"] / 60),
     )
 
+    if os.path.exists(f"{OUT}/S2_large_animation.mp4"):
+        payload["video"] = "S2_large_animation.mp4"
+
     p4 = f"{OUT}/S4_tectonic_meta.json"
     if os.path.exists(p4):
         m4 = json.load(open(p4))

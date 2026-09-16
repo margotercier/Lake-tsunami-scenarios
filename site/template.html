@@ -488,6 +488,22 @@ function renderTectonic(d){
         at the southern end.</figcaption></figure>`;
 }
 
+function renderVideo(d){
+  const t=document.getElementById("videoblock");
+  if(!d||!d.video){t.remove();return;}
+  t.innerHTML=`<figure>
+      <video controls muted playsinline preload="metadata" poster="figures/01_overview.png">
+        <source src="${d.video}" type="video/mp4">
+        Your browser cannot play this video. The file is <code>${d.video}</code>.
+      </video>
+      <figcaption><b>Thirty minutes of Lake Hāwea, scenario S2.</b> Blue is below normal
+        lake level, orange above. The colour scale is set for the far field, so the
+        impact wave itself is off-scale in the first minute — watch instead how the
+        energy works its way down the lake, through the narrows, and then keeps
+        sloshing in the southern basin long after the first wave has gone through.
+      </figcaption></figure>`;
+}
+
 function renderSeiche(d){
   const p=document.getElementById("seicheline");
   if(!d){p.remove();return;}
@@ -496,5 +512,6 @@ function renderSeiche(d){
     rectangular basin of the same length and mean depth gives ${d.merian} minutes.`;
 }
 
-renderStrip(DATA); renderResults(DATA); renderTectonic(DATA); renderSeiche(DATA);
+renderStrip(DATA); renderResults(DATA); renderVideo(DATA);
+renderTectonic(DATA); renderSeiche(DATA);
 </script>
